@@ -1,20 +1,32 @@
 plugins {
+    id 'org.springframework.boot' version '2.7.0'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'war'
 }
 
 dependencies {
     implementation project(":web")
+    providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 }
 
 group 'com.epam.esm'
 version '1.0'
+//mainClassName = 'com.epam.esm.SpringBootRestApplication'
 
 repositories {
     mavenCentral()
 }
 
-subprojects {
+bootJar {
+    manifest {
+        attributes 'Start-Class': 'com.epam.esm.SpringBootRestApplication'
+    }
+}
+
+allprojects {
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
     apply plugin: 'java'
     apply plugin: 'war'
 
@@ -27,25 +39,28 @@ subprojects {
 
     ext {
         springVersion = '5.3.18'
-        servletVersion = '4.0.1'
-        junitversion = '5.8.2'
-        jacksonVersion = '2.13.3'
+        modelMapperVersion = '3.1.0'
     }
 
     dependencies {
-        implementation group: 'org.springframework', name: 'spring-core', version: springVersion
-        implementation group: 'org.springframework', name: 'spring-context', version: springVersion
-        testImplementation group: 'org.springframework', name: 'spring-test', version: springVersion
-        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jacksonVersion
-        implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jacksonVersion
-        implementation 'org.hibernate.validator:hibernate-validator:7.0.4.Final'
-        testImplementation "org.junit.jupiter:junit-jupiter-api:$junitversion"
-        testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitversion"
-        implementation 'com.h2database:h2:2.1.212'
-        implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.6'
-    }
-}
 
-test {
-    useJUnitPlatform()
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        runtimeOnly 'org.postgresql:postgresql'
+
+        testImplementation "org.springframework.boot:spring-boot-starter-test"
+//                {
+//            exclude group: "junit", module: "junit"
+//        }
+//        testImplementation "org.junit.jupiter:junit-jupiter:5.8.2"
+    }
+
+    test {
+        useJUnitPlatform()
+    }
 }

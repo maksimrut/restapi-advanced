@@ -2,6 +2,7 @@ package com.epam.esm.controller;
 
 import com.epam.esm.exception.CustomError;
 import com.epam.esm.exception.CustomNotFoundException;
+import com.epam.esm.exception.GiftCertificateException;
 import com.epam.esm.exception.ResourceDuplicateException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,7 +43,7 @@ public class ExceptionController {
     }
 
     /**
-     * Not found custom error.
+     * Not found handler error.
      *
      * @return the custom error
      */
@@ -63,5 +64,11 @@ public class ExceptionController {
     public CustomError badRequest(ResourceDuplicateException e) {
         return new CustomError(40001, String.format(
                 "The resource with %s %s already exists", e.getUniqueField(), e.getUniqueFieldValue()));
+    }
+
+    @ExceptionHandler(GiftCertificateException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public CustomError handleGiftCertificateException() {
+        return new CustomError(40410, "The entity is not exists");
     }
 }

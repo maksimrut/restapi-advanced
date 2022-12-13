@@ -1,10 +1,13 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.GiftCertificateException;
 import com.epam.esm.exception.ServiceException;
 import com.epam.esm.repository.impl.GiftCertificateRepositoryImpl;
-import org.junit.jupiter.api.BeforeAll;
+import com.epam.esm.service.dto.GiftCertificateDto;
+import com.epam.esm.util.CertificateQueryParameters;
+import com.epam.esm.util.Page;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,18 +41,20 @@ class GiftCertificateServiceImplTest {
     private GiftCertificateServiceImpl certificateService;
 
     private List<GiftCertificate> giftCertificates;
+    private GiftCertificate c1;
+    private GiftCertificateDto c1Dto;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
         giftCertificates = new ArrayList<>();
 
-        GiftCertificate c1 = new GiftCertificate();
+        c1 = new GiftCertificate();
         c1.setId(1L);
         c1.setName("certificate1");
         c1.setDescription("description of c1");
         c1.setPrice(BigDecimal.valueOf(1.5));
         c1.setDuration(30);
-        c1.setCreateDate(LocalDateTime.now().minusDays(2L));
+        c1.setCreateDate(LocalDateTime.now());
         c1.setLastUpdateDate(LocalDateTime.now());
 
         GiftCertificate c2 = new GiftCertificate();
@@ -69,41 +74,51 @@ class GiftCertificateServiceImplTest {
         c3.setDuration(30);
         c3.setCreateDate(LocalDateTime.now());
 
-        Tag testTag = new Tag();
-        testTag.setId(1L);
-        testTag.setName("test tagName");
+        c1Dto = new GiftCertificateDto();
+        c1Dto.setId(1L);
+        c1Dto.setName("certificate1");
+        c1Dto.setDescription("description of c1");
+        c1Dto.setPrice(BigDecimal.valueOf(1.5));
+        c1Dto.setDuration(30);
+        c1Dto.setCreateDate(LocalDateTime.now());
+        c1Dto.setLastUpdateDate(LocalDateTime.now());
 
-        c1.getTags().add(testTag);
         giftCertificates.add(c1);
         giftCertificates.add(c2);
         giftCertificates.add(c3);
     }
 
     @Test
-    void findAll() {
-        Mockito.when(certificateRepository.findAll()).thenReturn(giftCertificates);
-        List<GiftCertificate> actual = certificateService.findAll();
-        assertEquals(giftCertificates, actual);
-    }
-
-    @Test
-    void findById() {
-        Mockito.when(certificateRepository.findById(Mockito.anyLong()))
-                .thenAnswer(invocation -> giftCertificates.stream()
-                        .filter(c -> c.getId().equals(invocation.getArgument(0))).findAny());
-        Optional<GiftCertificate> certificate = certificateService.findById(2L);
-        String expected = "certificate2";
-        String actual = certificate.get().getName();
+    void findByIdPositive() {
+        Mockito.when(certificateRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(c1));
+        GiftCertificate certificate = certificateService.findById(1L);
+        String expected = "certificate1";
+        String actual = certificate.getName();
         assertEquals(expected, actual);
     }
 
     @Test
-    void create() throws ServiceException {
-        GiftCertificate certificate = new GiftCertificate();
-        Mockito.when(certificateRepository.create(certificate)).thenReturn(certificate);
-        GiftCertificate actual = certificateService.create(certificate);
-        Mockito.verify(certificateRepository, Mockito.times(1)).create(certificate);
-        assertEquals(certificate, actual);
+    void findByIdNonExistentEntityThrowsException() {
+        assertThrows(GiftCertificateException.class, () -> certificateService.findById(5L));
+    }
+
+    @Test
+    void findCertificateDtoByIdPositive() {
+        Mockito.when(certificateRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(c1));
+        GiftCertificateDto certificateDto = certificateService.findCertificateDtoById(1L);
+        String expected = "certificate1";
+        String actual = certificateDto.getName();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void createPositiveWithoutTags() throws ServiceException {
+        Mockito.when(certificateRepository.save(Mockito.any(GiftCertificate.class))).thenReturn(c1);
+        GiftCertificateDto actual = certificateService.create(c1Dto);
+        actual.setCreateDate(c1Dto.getCreateDate());
+        actual.setLastUpdateDate(c1Dto.getLastUpdateDate());
+        Mockito.verify(certificateRepository, Mockito.times(1)).save(Mockito.any(GiftCertificate.class));
+        assertEquals(c1Dto, actual);
     }
 
     @Test
@@ -113,17 +128,25 @@ class GiftCertificateServiceImplTest {
     }
 
     @Test
-    void updateFalse() {
+    void updateThrowsException() {
         assertThrows(ServiceException.class,
-                () -> certificateService.update(0L,new GiftCertificate()));
+                () -> certificateService.update(0L,new GiftCertificateDto()));
     }
 
     @Test
-    void update() throws ServiceException {
-        GiftCertificate expected = new GiftCertificate();
-        Mockito.when(certificateRepository.findById(1L)).thenReturn(Optional.of(expected));
-        Mockito.when(certificateRepository.update(1L, expected)).thenReturn(expected);
-        GiftCertificate actual = certificateService.update(1L, expected);
-        assertEquals(expected, actual);
+    void updatePositiveWithoutTags() throws ServiceException {
+        Mockito.when(certificateRepository.findById(1L)).thenReturn(Optional.of(c1));
+        Mockito.when(certificateRepository.update(c1)).thenReturn(c1);
+        GiftCertificate actual = modelMapper.map(certificateService.update(1L, c1Dto), GiftCertificate.class);
+        assertEquals(c1, actual);
+    }
+
+    @Test
+    void findAllByParamsPositive() {
+        Page page = new Page(1, 7);
+        CertificateQueryParameters queryParameters = new CertificateQueryParameters(new String[]{}, "cert", "DESC", "ASC");
+        Mockito.when(certificateRepository.findAllByParams(queryParameters, page)).thenReturn(giftCertificates);
+        List<GiftCertificateDto> actual = certificateService.findAllByParams(queryParameters, page);
+        assertEquals(giftCertificates.size(), actual.size());
     }
 }

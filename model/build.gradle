@@ -1,13 +1,7 @@
 ext {
-    jupiterVersion = '5.8.2'
+    h2DataBaseVersion = '2.1.214'
 }
 
 dependencies {
-    implementation group: 'org.springframework', name: 'spring-jdbc', version: springVersion
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$jupiterVersion"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jupiterVersion"
-}
-
-test {
-    useJUnitPlatform()
+    testImplementation group: 'com.h2database', name: 'h2', version: h2DataBaseVersion
 }

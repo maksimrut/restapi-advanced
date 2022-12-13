@@ -1,10 +1,10 @@
 package com.epam.esm.service;
 
-import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ServiceException;
+import com.epam.esm.service.dto.TagDto;
+import com.epam.esm.util.Page;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * The Tag service interface.
@@ -19,7 +19,7 @@ public interface TagService {
      *
      * @return the list
      */
-    List<Tag> findAll();
+    List<TagDto> findAllTags(Page page);
 
     /**
      * Find tag by id.
@@ -27,31 +27,31 @@ public interface TagService {
      * @param id the id
      * @return the optional with a tag object if it exists, otherwise the empty optional
      */
-    Optional<Tag> findById(Long id);
+    TagDto findTagById(Long id);
 
     /**
-     * Create tag.
+     * Save tag.
      *
-     * @param tag the tag object
+     * @param tagDto the tag object
      * @return the created tag
      * @throws ServiceException the service exception if this tag already exists in the database
      */
-    Tag create(Tag tag) throws ServiceException;
+    TagDto save(TagDto tagDto) throws ServiceException;
 
     /**
      * Delete the tag by id.
      *
      * @param id the id
      */
-    void delete(Long id);
+    void deleteTag(Long id);
 
     /**
      * boolean check if tag exists.
      *
-     * @param tag the tag
+     * @param tagDto the tag
      * @return the boolean
      */
-    boolean exist(Tag tag);
+    boolean isExists(TagDto tagDto);
 
     /**
      * long, find tag by name.

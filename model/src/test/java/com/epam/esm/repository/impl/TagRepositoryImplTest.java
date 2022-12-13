@@ -1,68 +1,76 @@
 package com.epam.esm.repository.impl;
 
-import com.epam.esm.config.DevConfig;
+import com.epam.esm.config.TestConfig;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.util.Page;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringJUnitConfig(DevConfig.class)
-@ActiveProfiles("dev")
+@SpringBootTest(classes = {TestConfig.class})
+@ActiveProfiles("test")
+@Transactional
 class TagRepositoryImplTest {
 
+    private Tag tag;
+
     @Autowired
-    private TagRepositoryImpl tagRepository;
+    TagRepositoryImpl tagRepository;
+
+    @BeforeEach
+    void setUp() {
+        tag = new Tag();
+        tag.setName("CreatedTag");
+    }
 
     @Test
     void findAll() {
-        List<Tag> tags = tagRepository.findAll();
-        int expected = 5;
-        int actual = tags.size();
-        assertEquals(expected, actual);
+        Page page = new Page(1, 10);
+        List<Tag> tags = tagRepository.findAll(page);
+        assertEquals(4, tags.size());
     }
 
     @Test
     void findById() {
-        Optional<Tag> tagOptional = tagRepository.findById(1L);
-        assertNotNull(tagOptional.get());
+        Optional<Tag> optionalTag = tagRepository.findById(1L);
+        assertNotNull(optionalTag.get());
     }
 
     @Test
-    void create() {
-        Tag newTag = new Tag();
-        newTag.setName("seventh");
-        Tag dbTag = tagRepository.create(newTag);
-        assertNotNull(dbTag.getId());
+    void findByNameReturnsEmptyWithNonExistentTag() {
+        Optional<Tag> actual = tagRepository.findByName("NonExistent");
+        assertTrue(actual.isEmpty());
+    }
+
+    @Test
+    void save() {
+        Tag actual = tagRepository.save(tag);
+        assertEquals("CreatedTag", actual.getName());
     }
 
     @Test
     void deleteById() {
-        tagRepository.deleteById(4L);
-        Optional<Tag> tag = tagRepository.findById(4L);
-        Boolean expected = Boolean.TRUE;
-        Boolean actual = tag.isEmpty();
-        assertEquals(expected, actual);
+        tagRepository.deleteById(2L);
+        assertTrue(tagRepository.findById(2L).isEmpty());
     }
 
     @Test
     void findByName() {
-        Tag tag = tagRepository.findByName("first").get();
-        long expected = 1L;
-        long actual = tag.getId();
-        assertEquals(expected, actual);
+        Optional<Tag> actual = tagRepository.findByName("second");
+        assertTrue(actual.isPresent());
     }
 
     @Test
     void findAllByGiftCertificateId() {
         List<Tag> tags = tagRepository.findAllByGiftCertificateId(1L);
-        int expected = 2;
-        int actual = tags.size();
-        assertEquals(expected, actual);
+        assertEquals(2, tags.size());
     }
 }

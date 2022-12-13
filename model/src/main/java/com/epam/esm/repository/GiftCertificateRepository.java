@@ -1,8 +1,8 @@
 package com.epam.esm.repository;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Query;
-import com.epam.esm.entity.Tag;
+import com.epam.esm.util.CertificateQueryParameters;
+import com.epam.esm.util.Page;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,24 +13,15 @@ import java.util.List;
  * @author Maksim Rutkouski
  */
 @Repository
-public interface GiftCertificateRepository extends BaseRepository<Long, GiftCertificate> {
+public interface GiftCertificateRepository extends BaseRepository<GiftCertificate> {
 
     /**
      * Update gift certificate.
      *
-     * @param id              the id
      * @param giftCertificate the gift certificate
      * @return the gift certificate
      */
-    GiftCertificate update(Long id, GiftCertificate giftCertificate);
-
-    /**
-     * Find all tags by certificate id.
-     *
-     * @param giftCertificateId the gift certificate id
-     * @return the list
-     */
-    List<Tag> findCertificateTags(Long giftCertificateId);
+    GiftCertificate update(GiftCertificate giftCertificate);
 
     /**
      * Add tag to the certificate.
@@ -50,8 +41,8 @@ public interface GiftCertificateRepository extends BaseRepository<Long, GiftCert
     /**
      * Find all certificates by params list with query.
      *
-     * @param query the query
+     * @param queryParameters the query parameters
      * @return the list
      */
-    List<GiftCertificate> findAllByParams(Query query);
+    List<GiftCertificate> findAllByParams(CertificateQueryParameters queryParameters, Page page);
 }

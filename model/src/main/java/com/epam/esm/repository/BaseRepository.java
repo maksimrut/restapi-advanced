@@ -1,24 +1,25 @@
 package com.epam.esm.repository;
 
+import com.epam.esm.util.Page;
+
 import java.util.List;
 import java.util.Optional;
 
 /**
  * The interface Base repository.
  *
- * @param <T> the type parameter
  * @param <E> the type parameter
  *
  * @author Maksim Rutkouski
  */
-public interface BaseRepository<T, E> {
+public interface BaseRepository<E> {
 
     /**
      * Find all entities.
      *
      * @return the list
      */
-    List<E> findAll();
+    List<E> findAll(Page page);
 
     /**
      * Find entity by id optional.
@@ -26,7 +27,7 @@ public interface BaseRepository<T, E> {
      * @param id the id
      * @return the optional
      */
-    Optional<E> findById(T id);
+    Optional<E> findById(Long id);
 
     /**
      * Create entity.
@@ -34,12 +35,12 @@ public interface BaseRepository<T, E> {
      * @param entity the entity
      * @return the e
      */
-    E create(E entity);
+    E save(E entity);
 
     /**
      * Delete entity by id.
      *
      * @param id the id
      */
-    void deleteById(T id);
+    void deleteById(Long id);
 }

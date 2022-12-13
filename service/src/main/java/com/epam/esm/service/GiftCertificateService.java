@@ -1,11 +1,12 @@
 package com.epam.esm.service;
 
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Query;
 import com.epam.esm.exception.ServiceException;
+import com.epam.esm.service.dto.GiftCertificateDto;
+import com.epam.esm.util.CertificateQueryParameters;
+import com.epam.esm.util.Page;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * The interface Gift certificate service.
@@ -15,28 +16,29 @@ import java.util.Optional;
 public interface GiftCertificateService {
 
     /**
-     * Find all certificates list.
-     *
-     * @return the list of certificates
-     */
-    List<GiftCertificate> findAll();
-
-    /**
-     * Find by id optional.
+     * Find certificate by id.
      *
      * @param id the id
      * @return the optional with a certificate object if it exists, otherwise the empty optional
      */
-    Optional<GiftCertificate> findById(Long id);
+    GiftCertificate findById(Long id);
+
+    /**
+     * Find certificate by id.
+     *
+     * @param id the id
+     * @return the optional with a certificate object if it exists, otherwise the empty optional
+     */
+    GiftCertificateDto findCertificateDtoById(Long id);
 
     /**
      * Create or save gift certificate.
      *
-     * @param certificate the certificate
+     * @param certificateDto the certificate
      * @return the created certificate
      * @throws ServiceException the service exception
      */
-    GiftCertificate create(GiftCertificate certificate) throws ServiceException;
+    GiftCertificateDto create(GiftCertificateDto certificateDto) throws ServiceException;
 
     /**
      * Delete certificate by id.
@@ -49,19 +51,20 @@ public interface GiftCertificateService {
      * Update gift certificate.
      *
      * @param id          the id
-     * @param certificate the certificate
+     * @param certificateDto the certificate
      * @return the gift certificate
      * @throws ServiceException the service exception if the certificate with id doesn't exist.
      */
-    GiftCertificate update(Long id, GiftCertificate certificate) throws ServiceException;
+    GiftCertificateDto update(Long id, GiftCertificateDto certificateDto) throws ServiceException;
 
     /**
      * Find all certificate by query params.
      *
-     * @param query the query
+     * @param queryParameters the query parameters
+     * @param page chosen page
      * @return the list of found certificates
      */
-    List<GiftCertificate> findAllByParams(Query query);
+    List<GiftCertificateDto> findAllByParams(CertificateQueryParameters queryParameters, Page page);
 
     /**
      * Clear tags.

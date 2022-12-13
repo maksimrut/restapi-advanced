@@ -4,12 +4,9 @@ ext {
 
 dependencies {
     implementation project(":model")
-    implementation 'org.modelmapper:modelmapper:3.1.0'
+    implementation "org.modelmapper:modelmapper:$modelMapperVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
     testImplementation "org.mockito:mockito-junit-jupiter:$mockitoVersion"
     implementation group: 'org.springframework', name: 'spring-tx', version: springVersion
-}
-
-test {
-    useJUnitPlatform()
+    implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 }

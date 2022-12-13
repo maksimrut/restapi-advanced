@@ -12,7 +12,7 @@ import java.util.Optional;
  * @author Maksim Rutkouski
  */
 @Repository
-public interface TagRepository extends BaseRepository<Long, Tag> {
+public interface TagRepository extends BaseRepository<Tag> {
 
     /**
      * Find tag by name optional.

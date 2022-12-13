@@ -1,22 +1,25 @@
 package com.epam.esm.repository.impl;
 
-import com.epam.esm.config.DevConfig;
+import com.epam.esm.config.TestConfig;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Query;
+import com.epam.esm.util.Page;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringJUnitConfig(DevConfig.class)
-@ActiveProfiles("dev")
+@SpringBootTest(classes = {TestConfig.class})
+@ActiveProfiles("test")
+@Transactional
 class GiftCertificateRepositoryImplTest {
 
     @Autowired
@@ -24,8 +27,9 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void findAll() {
-        List<GiftCertificate> certificates = certificateRepository.findAll();
-        int expected = 4;
+        Page page = new Page(1, 10);
+        List<GiftCertificate> certificates = certificateRepository.findAll(page);
+        int expected = 3;
         int actual = certificates.size();
         assertEquals(expected, actual);
     }
@@ -45,7 +49,7 @@ class GiftCertificateRepositoryImplTest {
         certificate.setDuration(15);
         certificate.setCreateDate(LocalDateTime.now());
         certificate.setLastUpdateDate(LocalDateTime.now().minusDays(2L));
-        GiftCertificate certificateBD = certificateRepository.create(certificate);
+        GiftCertificate certificateBD = certificateRepository.save(certificate);
         assertNotNull(certificateBD.getId());
     }
 
@@ -62,16 +66,9 @@ class GiftCertificateRepositoryImplTest {
     void update() {
         Optional<GiftCertificate> certificate = certificateRepository.findById(1L);
         certificate.get().setDuration(100);
-        certificateRepository.update(1L, certificate.get());
+        certificateRepository.update(certificate.get());
         int expected = 100;
         int actual = certificateRepository.findById(1L).get().getDuration();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void findCertificateTags() {
-        int expected = 2;
-        int actual = certificateRepository.findCertificateTags(1L).size();
         assertEquals(expected, actual);
     }
 
@@ -79,7 +76,7 @@ class GiftCertificateRepositoryImplTest {
     void addTag() {
         certificateRepository.addTag(2L, 1L);
         int expected = 2;
-        int actual = certificateRepository.findCertificateTags(2L).size();
+        int actual = certificateRepository.findById(2L).get().getTags().size();
         assertEquals(expected, actual);
     }
 
@@ -88,17 +85,6 @@ class GiftCertificateRepositoryImplTest {
         certificateRepository.clearTags(3L);
         int expected = 0;
         int actual = certificateRepository.findById(3L).get().getTags().size();
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    void findAllByParamsAndSortByDate() {
-        Query query = new Query();
-        query.setPartName("e");
-        query.setSortByDate("ASC");
-        List<GiftCertificate> certificates = certificateRepository.findAllByParams(query);
-        String expected = "5element";
-        String actual = certificates.get(1).getName();
         assertEquals(expected, actual);
     }
 }
